@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUPERADMIN
+  ADMIN
+  USER
+}
+
+model User {
+  id                  String              @id @default(auto()) @map("_id") @db.ObjectId
+  name                String?
+  email               String              @unique
+  emailVerified       DateTime?
+  image               String?
+  role                Role                @default(USER)
+  approved            Boolean             @default(false)
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  sessions            Session[]
+  password            String
+  note                Note?               @relation("UserNotes")
+  toolUsages          ToolUsage[]
+  brandUsages         BrandUsage[]
+  userVisits          UserVisit[]
+  serviceAccessRoles  ServiceAccessRole[] // Relation field for service access roles
+  isQCallAccessible   Boolean             @default(false) // Field for QCall access
+}
+
+model Brand {
+  id      String              @id @default(auto()) @map("_id") @db.ObjectId
+  name    String              @unique
+  users   ServiceAccessRole[] // Relation to ServiceAccessRole
+}
+
+model ServiceAccessRole {
+  id      String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId  String  @db.ObjectId
+  brandId String  @db.ObjectId
+  user    User    @relation(fields: [userId], references: [id])
+  brand   Brand   @relation(fields: [brandId], references: [id])
+
+  @@unique([userId, brandId]) // Ensure each user can only have one role per brand
+}
+
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  userId       String   @db.ObjectId
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+model Note {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  document  Json?    @db.Json
+  userId    String   @unique @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], name: "UserNotes")
+}
+
+model ToolUsage {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String   @db.ObjectId
+  toolName   String
+  usageCount Int      @default(0)
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, toolName])
+}
+
+model BrandUsage {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String   @db.ObjectId
+  brandName  String
+  usageCount Int      @default(0)
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, brandName])
+}
+
+model UserVisit {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String   @db.ObjectId
+  date       DateTime @default(now()) @db.Date
+  visitCount Int      @default(1)
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, date])
+}

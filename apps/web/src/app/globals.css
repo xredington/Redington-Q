@@ -1,0 +1,101 @@
+body {
+  min-height: 100vh;
+  color:#2B2F42;
+  font-family: "Roboto", "Inter";
+}
+.bn-container .bn-editor {
+  min-height:calc(100vh - 12rem);
+  border-radius: 1.5rem;
+}
+.editor-main .bn-editor{
+  min-height:calc(100vh - 7rem)
+}
+
+/* .editor-main .bn-editor{
+  min-height:calc(100vh - 10rem)
+} */
+
+
+
+.dashboard-section {
+  width: 100%;
+  background:linear-gradient(to top, #d7ffdcac, #ffffffef) !important;
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-radius: 2rem;
+}
+
+.card-frosted{
+  background-color: #dddddd87
+}
+
+.bn-container[data-theming-css-variables-main][data-color-scheme="light"] {
+  --bn-colors-editor-text: #2B2F42;
+--bn-colors-editor-background: #f2f2f289;
+--bn-colors-menu-text: #2B2F42;
+--bn-colors-menu-background: #F6F6FB;
+--bn-colors-tooltip-text: #2B2F42;
+--bn-colors-tooltip-background: #efefef;
+--bn-colors-hovered-text: #2B2F42;
+--bn-colors-hovered-background: #efefef;
+--bn-colors-selected-text: #F6F6FB;
+--bn-colors-selected-background: #2B2F42;
+--bn-colors-disabled-text: #afafaf;
+--bn-colors-disabled-background: #efefef;
+
+--bn-colors-shadow: #cfcfcf;
+--bn-colors-border: #efefef;
+--bn-colors-side-menu: #cfcfcf;
+
+--bn-colors-highlights-gray-text: #9b9a97;
+--bn-colors-highlights-gray-background: #ebeced;
+--bn-colors-highlights-brown-text: #64473a;
+--bn-colors-highlights-brown-background: #e9e5e3;
+--bn-colors-highlights-red-text: #e03e3e;
+--bn-colors-highlights-red-background: #fbe4e4;
+--bn-colors-highlights-orange-text: #d9730d;
+--bn-colors-highlights-orange-background: #f6e9d9;
+--bn-colors-highlights-yellow-text: #dfab01;
+--bn-colors-highlights-yellow-background: #fbf3db;
+--bn-colors-highlights-green-text: #4d6461;
+--bn-colors-highlights-green-background: #ddedea;
+--bn-colors-highlights-blue-text: #0b6e99;
+--bn-colors-highlights-blue-background: #ddebf1;
+--bn-colors-highlights-purple-text: #6940a5;
+--bn-colors-highlights-purple-background: #eae4f2;
+--bn-colors-highlights-pink-text: #ad1a72;
+--bn-colors-highlights-pink-background: #f4dfeb;
+
+--bn-font-family:"Roboto", "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Open Sans",
+  "Segoe UI", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+  "Helvetica Neue", sans-serif;
+--bn-border-radius: 6px;
+}
+
+
+.skeletonBackground {
+  background: linear-gradient(90deg, rgba(240, 240, 240, 1) 25%, rgba(245, 245, 245, 1) 50%, rgba(240, 240, 240, 1) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.animated-line {
+  stroke-dasharray: 300;
+  stroke-dashoffset: 300;
+  animation: dash 2s linear infinite;
+}

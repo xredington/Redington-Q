@@ -1,0 +1,1 @@
+export const cardFrosted=`card-frosted backdrop-blur-3xl backdrop-filter backdrop-brightness-100 shadow`;
