@@ -11,6 +11,6 @@ module.exports = {
     ];
   },
   images: {
-    domains: ['r1-upload.s3.ap-south-1.amazonaws.com'], // Add your S3 bucket domain here
+    domains: ['r1-upload.s3.ap-south-1.amazonaws.com','s3.redq.ai.s3.me-central-1.amazonaws.com'], 
   },
 };
