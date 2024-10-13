@@ -80,28 +80,30 @@ const Editor = ({ className }: { className?: string }) => {
     useEffect(() => {
         async function loadInitialContent() {
             try {
-                if (!isDocumentLoaded&&session?.user.id) {
+                if (!isDocumentLoaded && session?.user.id) {
                     const data = await fetchDocument(session.user.id);
-                    if (data.document) {
+                    if (Array.isArray(data.document) && data.document.length > 0) {
                         dispatch(updateDocument(data.document));
+                        setInitialContent(data.document);
+                    } else {
+                        setInitialContent([]);
                     }
-                    setInitialContent(content);
                     dispatch(setDocumentLoaded(true));
                 }
             } catch (error) {
                 console.error("Failed to load initial content:", error);
-                setInitialContent(content as PartialBlock[]); 
+                setInitialContent([]);
             }
         }
         loadInitialContent();
-    }, [session?.user.id, dispatch]);
+    }, [session?.user.id, dispatch, isDocumentLoaded, content]);
 
     const editor = useMemo(() => {
         if (initialContent === "loading" && !isDocumentLoaded) {
             return null;
         }
-        return BlockNoteEditor.create({ initialContent:content, uploadFile });
-    }, [initialContent]);
+        return BlockNoteEditor.create({ initialContent: content || [], uploadFile });
+    }, [initialContent, content]);
 
     const handleEditorChange = useCallback(debounce(async (updatedEditor) => {
         const document = updatedEditor;
