@@ -41,7 +41,6 @@ async function uploadFile(file: File) {
     }
 }
 
-
 const fetchDocument = async (userId: string) => {
     const res = await fetch(`/api/notes?userId=${userId}`);
     if (!res.ok) throw new Error('Failed to fetch document');
@@ -58,7 +57,7 @@ const saveDocument = async (userId: string, document: PartialBlock<BlockSchema, 
     });
 }
 
-const EditorSkeleton = ({className}:{className?:string}) => (
+const EditorSkeleton = ({ className }: { className?: string }) => (
     <div className={`${className} bg-gray-100 rounded-xl p-6 w-full h-[500px] grid gap-4 flex-gow animate-pulse`}>
         <div className="h-12 bg-gray-200 rounded-lg mb-4 animate-pulse"></div>
         <div className="h-7 bg-gray-200 rounded-lg mb-2 animate-pulse"></div>
@@ -72,10 +71,11 @@ const EditorSkeleton = ({className}:{className?:string}) => (
 
 const Editor = ({ className }: { className?: string }) => {
     const content = useAppSelector(selectDocument);
-    const isDocumentLoaded=useAppSelector(selectDocumentLoaded)
+    const isDocumentLoaded = useAppSelector(selectDocumentLoaded);
     const dispatch = useAppDispatch();
     const { data: session } = useSession();
     const [initialContent, setInitialContent] = useState<PartialBlock[] | "loading">("loading");
+    const [editorInstance, setEditorInstance] = useState<BlockNoteEditor | null>(null); // Track editor instance
 
     useEffect(() => {
         async function loadInitialContent() {
@@ -96,40 +96,48 @@ const Editor = ({ className }: { className?: string }) => {
             }
         }
         loadInitialContent();
-    }, [session?.user.id, dispatch, isDocumentLoaded, content]);
+    }, [session?.user.id, dispatch, isDocumentLoaded]);
 
-    const editor = useMemo(() => {
-        if (initialContent === "loading" && !isDocumentLoaded) {
-            return null;
+    // Create editor only after initialContent is loaded and valid
+    useEffect(() => {
+        if (initialContent !== "loading" && !editorInstance) {
+            const editor = BlockNoteEditor.create({
+                initialContent: content || [],
+                uploadFile,
+            });
+            setEditorInstance(editor);
         }
-        return BlockNoteEditor.create({ initialContent: content || [], uploadFile });
-    }, [initialContent, content]);
+    }, [initialContent, content, editorInstance]);
 
-    const handleEditorChange = useCallback(debounce(async (updatedEditor) => {
-        const document = updatedEditor;
-        dispatch(updateDocument(document));
-        try {
-            if (session?.user.id) {
-                await saveDocument(session.user.id, document);
+    const handleEditorChange = useCallback(
+        debounce(async (updatedEditor) => {
+            const document = updatedEditor;
+            dispatch(updateDocument(document));
+            try {
+                if (session?.user.id) {
+                    await saveDocument(session.user.id, document);
+                }
+            } catch (error) {
+                console.error("Failed to save document:", error);
             }
-        } catch (error) {
-            console.error("Failed to save document:", error);
-        }
-    }, 1000), [session?.user.id, dispatch]);
+        }, 1000),
+        [session?.user.id, dispatch]
+    );
 
     if (initialContent === "loading" && !isDocumentLoaded) {
         return <EditorSkeleton className={className} />;
     }
 
-    return (
+    // Only render BlockNoteView if the editor instance is available
+    return editorInstance ? (
         <BlockNoteView
-            editor={editor!}
+            editor={editorInstance}
             className={`w-full ${className}`}
             data-theming-css-variables-main
-            theme={'light'}
-            onChange={() => handleEditorChange(editor!.document)}
+            theme={"light"}
+            onChange={() => handleEditorChange(editorInstance.document)}
         />
-    );
-}
+    ) : null;
+};
 
 export default Editor;
